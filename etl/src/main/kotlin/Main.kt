@@ -31,6 +31,7 @@ fun main() {
                 tags = items.map { item -> itemToTagCodeMap[item] ?: "unknwon" }
             )
         }
+    // TODO: fix quantity lost issue, couponCode=26997 is just a sample
     println(cleanedCouponData.filter { it.couponCode == 26997 })
 }
 
