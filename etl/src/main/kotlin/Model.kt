@@ -29,4 +29,5 @@ val GroupingRules = listOf(
         shouldRemoveBracket = true
     ),
     GroupRule("eggTart", "蛋塔", listOf("蛋撻", "原蛋")),
+    GroupRule("unknown", "-", listOf()),
 )
