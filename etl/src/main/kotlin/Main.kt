@@ -30,7 +30,7 @@ fun main() {
                 items = items,
                 amounts = amounts,
                 price = it.price,
-                tags = items.map { item -> itemToTagCodeMap[item] ?: "unknwon" }
+                tags = items.map { item -> itemToTagCodeMap[item]?.code ?: "unknwon" }
             )
         }
 }
@@ -78,7 +78,7 @@ fun groupingRawItems(couponIdToSplittedRawItems: Map<Int, List<String>>): Map<St
     return itemToGroupMap.toMap()
 }
 
-fun generateTagItems(itemToGroupMap: Map<String, String>): Map<String, String> {
+fun generateTagItems(itemToGroupMap: Map<String, String>): Map<String, ItemTag> {
     val regex = """\s*\([^)]+\)""".toRegex()
 
     return itemToGroupMap.map { (item, group) ->
@@ -96,16 +96,16 @@ fun generateTagItems(itemToGroupMap: Map<String, String>): Map<String, String> {
 
         val tagCode = TagCodeGeneator.getOrCreateId(tag)
 
-        item to tagCode
+        item to ItemTag(tagCode, item)
     }.toMap()
 }
 
 fun groupingCouponByTagItems(
     couponIdToSplittedRawItems: Map<Int, List<String>>,
-    itemToTagCodeMap: Map<String, String>
-): Map<Int, List<String>> =
+    itemToTagCodeMap: Map<String, ItemTag>
+): Map<Int, List<ItemTag>> =
     couponIdToSplittedRawItems.map { (couponId, items) ->
         couponId to items.map {
-            itemToTagCodeMap[it] ?: "unknown"
+            itemToTagCodeMap[it] ?: ItemTag("unknown", "unknown")
         }
     }.toMap()

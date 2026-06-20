@@ -31,3 +31,9 @@ val GroupingRules = listOf(
     GroupRule("eggTart", "蛋塔", listOf("蛋撻", "原蛋")),
     GroupRule("unknown", "-", listOf()),
 )
+
+
+data class ItemTag(
+    val code: String,
+    val chiName: String,
+)
