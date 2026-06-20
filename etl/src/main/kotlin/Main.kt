@@ -23,16 +23,16 @@ fun main() {
     val cleanedCouponData = rawCouponData.couponList
         .map {
             val items = it.items.map { item -> item.name }
+            val amounts = it.items.map { item -> item.count }
             CleandCoupon(
                 couponCode = it.couponCode,
                 coupleTitle = it.name,
                 items = items,
+                amounts = amounts,
                 price = it.price,
                 tags = items.map { item -> itemToTagCodeMap[item] ?: "unknwon" }
             )
         }
-    // TODO: fix quantity lost issue, couponCode=26997 is just a sample
-    println(cleanedCouponData.filter { it.couponCode == 26997 })
 }
 
 fun joinSplittedRawItems(rawCouponList: List<Coupon>): Map<Int, List<String>> {
