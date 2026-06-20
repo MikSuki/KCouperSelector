@@ -39,7 +39,7 @@ fun main() {
     writeFile(cleanedCouponData, "couple.json").onFailure {
         println("write couple.json failed !, error: $it")
     }
-    writeFile(itemToTagCodeMap.map { it.value }, "item_tag.json").onFailure {
+    writeFile(itemToTagCodeMap.values.distinct(), "item_tag.json").onFailure {
         println("write item_tag.json failed !, error: $it")
     }
 
@@ -106,7 +106,7 @@ fun generateTagItems(itemToGroupMap: Map<String, String>): Map<String, ItemTag> 
 
         val tagCode = TagCodeGeneator.getOrCreateId(tag)
 
-        item to ItemTag(tagCode, item)
+        item to ItemTag(tagCode, tag)
     }.toMap()
 }
 
