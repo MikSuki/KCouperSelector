@@ -5,7 +5,6 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 fun main() {
-    // 讀起來非常順手：API 客戶端，請幫我 getCoupons！
     val rawCouponData = KCouperApiClient.getCoupons()
 
     require(rawCouponData != null) { "cannot get KCouper data!" }
