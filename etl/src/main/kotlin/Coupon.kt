@@ -39,6 +39,7 @@ data class Flavor(
     @SerialName("addition_price") val additionPrice: Double = 0.0
 )
 
+@Serializable
 data class CleandCoupon(
     val couponCode: Int,
     val coupleTitle: String,

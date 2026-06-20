@@ -1,5 +1,7 @@
 package com.miksuki
 
+import kotlinx.serialization.Serializable
+
 data class GroupRule(
     val group: String,
     val gruopNameChi: String,
@@ -33,6 +35,7 @@ val GroupingRules = listOf(
 )
 
 
+@Serializable
 data class ItemTag(
     val code: String,
     val chiName: String,

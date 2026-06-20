@@ -1,5 +1,7 @@
 package com.miksuki
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 fun main() {
@@ -33,6 +35,14 @@ fun main() {
                 tags = items.map { item -> itemToTagCodeMap[item]?.code ?: "unknwon" }
             )
         }
+
+    writeFile(cleanedCouponData, "couple.json").onFailure {
+        println("write couple.json failed !, error: $it")
+    }
+    writeFile(itemToTagCodeMap.map { it.value }, "item_tag.json").onFailure {
+        println("write item_tag.json failed !, error: $it")
+    }
+
 }
 
 fun joinSplittedRawItems(rawCouponList: List<Coupon>): Map<Int, List<String>> {
@@ -109,3 +119,11 @@ fun groupingCouponByTagItems(
             itemToTagCodeMap[it] ?: ItemTag("unknown", "unknown")
         }
     }.toMap()
+
+
+inline fun <reified T> writeFile(list: List<T>, fileName: String): Result<Unit> = runCatching {
+    val file = File(fileName)
+    val jsonString = Json { prettyPrint = true }
+        .encodeToString(list)
+    file.writeText(jsonString)
+}
