@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+interface ItemTag {
+  couponCode: number,
+  coupleTitle: String,
+  tags: Array<String>,
+  items: Array<String>,
+  amounts: Array<number>,
+  price: number,
+}
+
 // 1. 修正：你忘記宣告 itemTagData 了！必須使用 ref([]) 給它一個初始空陣列
-const itemTagData = ref<any[]>([])
+const itemTagData = ref<ItemTag[]>([])
 
 const fetchItemTagData = async () => {
   try {
