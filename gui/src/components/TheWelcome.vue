@@ -10,8 +10,18 @@ interface ItemTag {
   price: number,
 }
 
+interface Coupon {
+  couponCode: number,
+  coupleTitle: String,
+  tags: Array<String>,
+  items: Array<String>,
+  amounts: Array<number>,
+  price: number,
+}
+
 // 1. 修正：你忘記宣告 itemTagData 了！必須使用 ref([]) 給它一個初始空陣列
 const itemTagData = ref<ItemTag[]>([])
+const couponData = ref<Coupon[]>([])
 
 const fetchItemTagData = async () => {
   try {
@@ -31,7 +41,27 @@ const fetchItemTagData = async () => {
   }
 }
 
-fetchItemTagData()
+const fetchCouponData = async () => {
+  try {
+    const baseURL = import.meta.env.BASE_URL
+    const response = await fetch(`${baseURL}data/coupon_data.json`)
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+    const data = await response.json()
+    console.log('Coupon data:', data)
+
+    // 在 <script> 裡面，賦值要用 .value
+    couponData.value = data
+  } catch (error) {
+    console.error('Failed to load coupon_data.json:', error)
+  }
+}
+
+await fetchItemTagData()
+await fetchCouponData()
+
+console.log('Coupon data:', couponData.value)
 
 const inputText = ref('')
 const displayText = () => {
