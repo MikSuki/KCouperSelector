@@ -3,18 +3,18 @@ import { ref } from 'vue'
 
 interface ItemTag {
   couponCode: number,
-  coupleTitle: String,
-  tags: Array<String>,
-  items: Array<String>,
+  coupleTitle: string,
+  tags: Array<string>,
+  items: Array<string>,
   amounts: Array<number>,
   price: number,
 }
 
 interface Coupon {
   couponCode: number,
-  coupleTitle: String,
-  tags: Array<String>,
-  items: Array<String>,
+  coupleTitle: string,
+  tags: Array<string>,
+  items: Array<string>,
   amounts: Array<number>,
   price: number,
 }
