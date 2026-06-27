@@ -81,8 +81,6 @@ export function getBestCouponCombination(
       return;
     }
 
-    // 🎯 步驟 5 的溢出檢查已完全拔除！無論數量多爆，只要便宜就繼續往下算
-
     // 【步驟 6：目標滿足判定與紀錄更新】
     if (isAllSatisfied(currentProgress, targetTags)) {
       bestPrice = currentPrice;
@@ -90,22 +88,12 @@ export function getBestCouponCombination(
       return;
     }
 
-    // 【步驟 7：依序遍歷優惠券與實質貢獻度檢查（全溢出跳過）】
+    // 【步驟 7：依序遍歷優惠券與實質貢獻度檢查】
     for (let i = index; i < filteredCoupons.length; i++) {
       const coupon = filteredCoupons[i];
 
-      // 檢查這張券在我們關心的品項中，有沒有任何一項是目前還沒填滿的
-      let hasContribution = false;
-      for (const [tag, amount] of coupon.tagMap.entries()) {
-        const currentCount = currentProgress.get(tag) || 0;
-        const targetCount = targetTags[tag] || 0;
-        if (currentCount < targetCount && amount > 0) {
-          hasContribution = true;
-          break;
-        }
-      }
-
-      if (!hasContribution) {
+      // 🎯 抽離後的私有函式呼叫：檢查這張券是否有實質貢獻
+      if (!hasValueContribution(coupon.tagMap, currentProgress, targetTags)) {
         continue;
       }
 
@@ -133,6 +121,26 @@ export function getBestCouponCombination(
     totalPrice: bestPrice,
     couponList: bestCombo,
   };
+}
+
+/**
+ * 輔助函式：判斷該優惠券是否能為目前尚未滿足的品項提供「實質貢獻」
+ */
+function hasValueContribution(
+  couponTagMap: Map<string, number>,
+  currentProgress: Map<string, number>,
+  targetTags: TargetTags
+): boolean {
+  for (const [tag, amount] of couponTagMap.entries()) {
+    const currentCount = currentProgress.get(tag) || 0;
+    const targetCount = targetTags[tag] || 0;
+
+    // 只要這張券包含的某個品項，目前的累積數量還沒達到目標，且該券確實有送該品項
+    if (currentCount < targetCount && amount > 0) {
+      return true; // 發現實質貢獻，立刻回傳 true 中斷檢查
+    }
+  }
+  return false; // 所有品項都溢出了，毫無貢獻
 }
 
 function isAllSatisfied(progress: Map<string, number>, target: TargetTags): boolean {
