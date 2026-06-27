@@ -1,22 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { type Coupon, getBestCouponCombination, type TargetTags } from '@/algo.ts'
 
 interface ItemTag {
-  couponCode: number,
-  coupleTitle: string,
-  tags: Array<string>,
-  items: Array<string>,
-  amounts: Array<number>,
-  price: number,
-}
-
-interface Coupon {
-  couponCode: number,
-  coupleTitle: string,
-  tags: Array<string>,
-  items: Array<string>,
-  amounts: Array<number>,
-  price: number,
+  code: string
+  chiName: string
 }
 
 // 1. 修正：你忘記宣告 itemTagData 了！必須使用 ref([]) 給它一個初始空陣列
@@ -62,6 +50,17 @@ await fetchItemTagData()
 await fetchCouponData()
 
 console.log('Coupon data:', couponData.value)
+// console.log(getBestCouponCombination(couponData.value, {"0016": 1}))
+const wanted: TargetTags = { '0011': 1, '0017': 1 , '0008': 1, '0002': 1}
+const targetKeys = Object.keys(wanted)
+const wantedToString = targetKeys
+  .map((key: string) => {
+    return `${itemTagData.value.find((e) => e.code == key)?.chiName}: ${wanted[key]}`
+  })
+  .join(', ')
+console.log(`user wanted: ${wantedToString}`)
+
+console.log(getBestCouponCombination(couponData.value, wanted))
 
 const inputText = ref('')
 const displayText = () => {
@@ -75,15 +74,18 @@ const displayText = () => {
       <div class="w3-container">
         <h4 class="w3-display-title">{{ tag.chiName }}</h4>
 
-        <p class="w3-display-content" style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 200px;">
+        <p
+          class="w3-display-content"
+          style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 200px"
+        >
           {{ tag.chiName }}
         </p>
 
         <button @click="displayText">{{ tag.chiName }}</button>
       </div>
     </div>
-    <div class="input-section" style="margin-top: 20px;">
-      <input v-model="inputText" placeholder="Enter text">
+    <div class="input-section" style="margin-top: 20px">
+      <input v-model="inputText" placeholder="Enter text" />
       <button @click="displayText">Show Text</button>
 
       <p v-if="inputText">{{ inputText }}</p>
@@ -98,18 +100,22 @@ const displayText = () => {
   justify-content: center;
   gap: 15px;
 }
+
 .w3-card {
   width: 200px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .input-section {
   margin-top: 20px;
   text-align: center;
 }
+
 input {
   padding: 8px;
   margin-right: 10px;
 }
+
 button {
   padding: 8px 12px;
   background-color: #42b983;
@@ -118,6 +124,7 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+
 p {
   margin-top: 10px;
   font-weight: bold;
