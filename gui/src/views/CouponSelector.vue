@@ -1,4 +1,3 @@
-<!--TODO: setup UI-->
 <template>
   <div class="coupon-optimizer-container">
     <h2>填寫您需要的餐點數量</h2>
@@ -141,8 +140,10 @@ console.log("render ok~")
 </script>
 
 <style scoped>
+/* 1. 確保外層容器是滿的 */
 .coupon-optimizer-container {
   max-width: 600px;
+  width: 100% !important; /* 強制撐滿 */
   margin: 20px auto;
   padding: 20px;
   border: 1px solid #e0e0e0;
@@ -150,30 +151,46 @@ console.log("render ok~")
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   font-family: system-ui, -apple-system, sans-serif;
+  box-sizing: border-box !important;
 }
 
-h2, h3, h4, h5 {
-  color: #333333;
-  margin-top: 0;
-}
-
+/* 2. 拋棄 Grid，改用絕對會橫向並排的 Flex 彈性流 */
 .input-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  display: flex !important;
+  flex-direction: row !important; /* 強制橫向 */
+  flex-wrap: wrap !important;     /* 寬度不夠時才准許折行 */
+  gap: 15px !important;           /* 選項之間的間距 */
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
+/* 3. 控制每個選項的寬度分配 */
 .input-group {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  /* 核心：預設大約佔 1/3 寬度（33%），扣掉 gap 變成 30% */
+  /* 並且設定最小寬度為 120px，如果畫面太窄放不下三個，就會自動把剩下的擠到下一列 */
+  flex: 1 1 calc(30% - 15px) !important;
+  min-width: 120px !important;
+  box-sizing: border-box !important;
 }
+@media (max-width: 380px) {
+  /* 當手機螢幕真的太小時，強制一列兩個，避免文字擠壓 */
+  .input-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 
 .input-group label {
   font-size: 14px;
   margin-bottom: 6px;
   color: #666666;
   font-weight: 500;
+  /* 避免文字太長時換行折得很醜 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .input-group input {
@@ -183,6 +200,8 @@ h2, h3, h4, h5 {
   font-size: 16px;
   outline: none;
   transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-group input:focus {
