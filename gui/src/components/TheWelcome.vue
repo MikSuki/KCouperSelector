@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { type Coupon, getBestCouponCombination, type TargetTags } from '@/algo.ts'
+import CouponSelector from '@/views/CouponSelector.vue'
 
 interface ItemTag {
   code: string
@@ -46,12 +47,14 @@ const fetchCouponData = async () => {
   }
 }
 
-await fetchItemTagData()
-await fetchCouponData()
+onMounted(async () => {
+  await fetchItemTagData()
+  await fetchCouponData()
+})
 
 console.log('Coupon data:', couponData.value)
 // console.log(getBestCouponCombination(couponData.value, {"0016": 1}))
-const wanted: TargetTags = { '0011': 1, '0017': 1 , '0008': 1, '0002': 1}
+const wanted: TargetTags = { '0011': 1, '0017': 1, '0008': 1, '0002': 1 }
 const targetKeys = Object.keys(wanted)
 const wantedToString = targetKeys
   .map((key: string) => {
@@ -69,28 +72,7 @@ const displayText = () => {
 </script>
 
 <template>
-  <div class="vue-cards-section">
-    <div v-for="(tag, index) in itemTagData" :key="index" class="w3-card w3-margin-bottom">
-      <div class="w3-container">
-        <h4 class="w3-display-title">{{ tag.chiName }}</h4>
-
-        <p
-          class="w3-display-content"
-          style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; width: 200px"
-        >
-          {{ tag.chiName }}
-        </p>
-
-        <button @click="displayText">{{ tag.chiName }}</button>
-      </div>
-    </div>
-    <div class="input-section" style="margin-top: 20px">
-      <input v-model="inputText" placeholder="Enter text" />
-      <button @click="displayText">Show Text</button>
-
-      <p v-if="inputText">{{ inputText }}</p>
-    </div>
-  </div>
+  <CouponSelector :item-tag-data="itemTagData" :coupon-data="couponData" />
 </template>
 
 <style scoped>
