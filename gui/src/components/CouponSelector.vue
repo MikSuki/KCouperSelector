@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { getBestCouponCombination, type Coupon, type TargetTags } from '../algo';
+import { getBestCouponCombination, type Coupon, type TargetTags } from '../algo.ts';
 
 console.log("render start~")
 
@@ -142,7 +142,7 @@ console.log("render ok~")
 <style scoped>
 /* 1. 確保外層容器是滿的 */
 .coupon-optimizer-container {
-  max-width: 600px;
+  max-width: 1200px;
   width: 100% !important; /* 強制撐滿 */
   margin: 20px auto;
   padding: 20px;
