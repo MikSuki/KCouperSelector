@@ -43,6 +43,20 @@
       <hr />
       <h3>最佳省錢組合結果</h3>
 
+      <!-- 🎯 新增：在總金額上方顯示本次計算鎖定的原始餐點組合 -->
+      <div class="target-demand-badge">
+        <div class="badge-title">本次試算目標餐點：</div>
+        <div class="badge-tags">
+          <span
+            v-for="demand in displayCalculatedDemands"
+            :key="demand.code"
+            class="demand-tag"
+          >
+            {{ demand.chiName }} × {{ demand.quantity }}
+          </span>
+        </div>
+      </div>
+
       <div class="total-price-badge">
         總金額：<span>${{ optimizationResult.totalPrice }}</span>
       </div>
@@ -116,6 +130,9 @@ onMounted(() => {
 // 響應式變數：紀錄使用者在每個 Tag 輸入的數量需求
 const userDemands = ref<Record<string, number>>({});
 
+// 🎯 新增：用於儲存點擊計算當下的需求快照，避免受後續輸入框更動影響
+const calculatedDemands = ref<TargetTags>({});
+
 // 控制載入中狀態的變數
 const isLoading = ref(false);
 
@@ -134,6 +151,18 @@ const isCalculatedDisabled = computed(() => {
   return !Object.values(userDemands.value).some(quantity => quantity > 0);
 });
 
+// 🎯 新增：將計算當下的快照轉換為包含中文名稱的陣列，供畫面上渲染使用
+const displayCalculatedDemands = computed(() => {
+  return Object.keys(calculatedDemands.value).map(code => {
+    const matchedItem = props.itemTagData.find(item => item.code === code);
+    return {
+      code,
+      chiName: matchedItem ? matchedItem.chiName : code,
+      quantity: calculatedDemands.value[code]
+    };
+  });
+});
+
 // 計算屬性：將演算回傳的 couponCode 陣列，轉換回完整的 Coupon 物件以便在畫面上渲染明細
 const displayCoupons = computed(() => {
   if (!optimizationResult.value) return [];
@@ -150,6 +179,7 @@ const displayCoupons = computed(() => {
 const handleOptimize = () => {
   // 🎯 新增：按下計算時，先清空上一次算出來的組合結果，避免視覺干擾
   optimizationResult.value = null;
+  calculatedDemands.value = {};
 
   // 1. 清理使用者輸入的資料，過濾掉 0 或負數，包裝成演算法需要的 TargetTags 格式
   const cleanTargetTags: TargetTags = {};
@@ -160,6 +190,9 @@ const handleOptimize = () => {
       cleanTargetTags[key] = value;
     }
   });
+
+  // 🎯 新增：在傳送與開啟 loading 前，先將本次的餐點要求鎖定儲存至快照
+  calculatedDemands.value = { ...cleanTargetTags };
 
   // 按下按鈕時開啟 Loading 狀態
   isLoading.value = true;
@@ -198,6 +231,7 @@ const cancelOptimize = () => {
     currentWorker = null;
   }
   isLoading.value = false; // 關閉遮罩
+  calculatedDemands.value = {};
   console.log('使用者取消了本次試算');
 };
 
@@ -210,6 +244,7 @@ const handleReset = () => {
     currentWorker = null;
   }
   userDemands.value = {};
+  calculatedDemands.value = {};
   optimizationResult.value = null;
   isLoading.value = false;
 };
@@ -301,7 +336,7 @@ h2, h3 {
   font-size: 16px;
   /* 🎯 修正：強制定義輸入框內的數字顏色，防止 because 全域 CSS 變成白字 */
   color: #0f172a !important;
-  background-color: #f8fafc !important; /* 給輸入框一個極淺的灰色底，更好辨識 */
+  background-color: #f8fafc !important; /* 给輸入框一個極淺的灰色底，更好辨識 */
   outline: none;
   transition: all 0.2s ease;
   width: 100%;
@@ -383,6 +418,37 @@ h2, h3 {
   height: 1px;
   background: #e2e8f0;
   margin: 25px 0;
+}
+
+/* 🎯 新增：本次試算目標餐點的樣式標籤區 */
+.target-demand-badge {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.target-demand-badge .badge-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.target-demand-badge .badge-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.target-demand-badge .demand-tag {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 /* 總金額的大徽章 */
