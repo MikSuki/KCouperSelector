@@ -140,54 +140,72 @@ console.log("render ok~")
 </script>
 
 <style scoped>
-/* 1. 確保外層容器是滿的 */
 .coupon-optimizer-container {
-  max-width: 1200px;
-  width: 100% !important; /* 強制撐滿 */
-  margin: 20px auto;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  /* 🎯 徹底解放：永遠維持目前螢幕寬度的 80% */
+  width: 90% !important;
+  max-width: 100% !important; /* 解除 1200px 限制，最高允許延伸至全螢幕 */
+
+  min-height: auto !important;
+  margin: 30px auto !important; /* 上下留白，左右靠 auto 完美鎖定在 80% 的正中央 */
+  padding: 35px;
+
+  border: 1px solid #eef2f5 !important;
+  border-radius: 16px !important;
   background-color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+
   font-family: system-ui, -apple-system, sans-serif;
   box-sizing: border-box !important;
 }
-
-/* 2. 拋棄 Grid，改用絕對會橫向並排的 Flex 彈性流 */
+/* =============================================================== */
+/* 🎯 核心 RWD 排版：改用 Grid 佈局能完美控制「一列幾個」 */
+/* =============================================================== */
 .input-grid {
-  display: flex !important;
-  flex-direction: row !important; /* 強制橫向 */
-  flex-wrap: wrap !important;     /* 寬度不夠時才准許折行 */
-  gap: 15px !important;           /* 選項之間的間距 */
+  display: grid !important;
+  gap: 15px !important;
   width: 100% !important;
   box-sizing: border-box !important;
+
+  /* 預設：超大螢幕一列排 4 個 */
+  grid-template-columns: repeat(4, 1fr);
 }
 
-/* 3. 控制每個選項的寬度分配 */
-.input-group {
-  display: flex !important;
-  flex-direction: column !important;
-  /* 核心：預設大約佔 1/3 寬度（33%），扣掉 gap 變成 30% */
-  /* 並且設定最小寬度為 120px，如果畫面太窄放不下三個，就會自動把剩下的擠到下一列 */
-  flex: 1 1 calc(30% - 15px) !important;
-  min-width: 120px !important;
-  box-sizing: border-box !important;
-}
-@media (max-width: 380px) {
-  /* 當手機螢幕真的太小時，強制一列兩個，避免文字擠壓 */
+/* 隨螢幕尺寸動態調整一列的數量 */
+@media (max-width: 1024px) {
   .input-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* 1024px 以下（如 iPad）：一列 3 個 */
   }
 }
 
+@media (max-width: 768px) {
+  .input-grid {
+    grid-template-columns: repeat(2, 1fr); /* 768px 以下（如直向平板）：一列 2 個 */
+  }
+}
+
+@media (max-width: 480px) {
+  .input-grid {
+    grid-template-columns: repeat(1, 1fr); /* 480px 以下（如小手機）：一列 1 個滿版 */
+  }
+}
+
+/* 控制每個選項的內部元件 */
+.input-group {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100%;
+  box-sizing: border-box !important;
+}
+
+/* =============================================================== */
+/* 剩下的樣式維持原樣 */
+/* =============================================================== */
 
 .input-group label {
   font-size: 14px;
   margin-bottom: 6px;
   color: #666666;
   font-weight: 500;
-  /* 避免文字太長時換行折得很醜 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -211,6 +229,7 @@ console.log("render ok~")
 .action-area {
   text-align: center;
   margin-bottom: 20px;
+  margin-top: 25px; /* 拉大跟上面 input 的間距 */
 }
 
 .submit-btn {
@@ -232,6 +251,10 @@ console.log("render ok~")
 .submit-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.result-section {
+  width: 100%;
 }
 
 .total-price-badge {
