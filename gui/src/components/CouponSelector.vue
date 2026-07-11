@@ -148,6 +148,9 @@ const displayCoupons = computed(() => {
  * 觸發演算法試算
  */
 const handleOptimize = () => {
+  // 🎯 新增：按下計算時，先清空上一次算出來的組合結果，避免視覺干擾
+  optimizationResult.value = null;
+
   // 1. 清理使用者輸入的資料，過濾掉 0 或負數，包裝成演算法需要的 TargetTags 格式
   const cleanTargetTags: TargetTags = {};
 
@@ -296,7 +299,7 @@ h2, h3 {
   border: 1px solid #cbd5e1 !important; /* 邊框線條更清晰 */
   border-radius: 8px;
   font-size: 16px;
-  /* 🎯 修正：強制定義輸入框內的數字顏色，防止因為全域 CSS 變成白字 */
+  /* 🎯 修正：強制定義輸入框內的數字顏色，防止 because 全域 CSS 變成白字 */
   color: #0f172a !important;
   background-color: #f8fafc !important; /* 給輸入框一個極淺的灰色底，更好辨識 */
   outline: none;
