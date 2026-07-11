@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { type Coupon, getBestCouponCombination, type TargetTags } from '@/algo.ts'
+import { type Coupon, getBestCouponCombination, type TargetTags } from '@/utils/algo.ts'
 import CouponSelector from '@/components/CouponSelector.vue'
 
 interface ItemTag {

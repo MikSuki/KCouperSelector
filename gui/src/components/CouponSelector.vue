@@ -70,7 +70,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { getBestCouponCombination, type Coupon, type TargetTags } from '../algo.ts';
+import { type Coupon, type TargetTags } from '../utils/algo.ts';
+
+// 🎯 核心修改：利用 Vite 的 ?worker 語法直接匯入實體 Worker 類別
+// (請確保底下的相對路徑正確指向你剛剛建立的 worker 檔案)
+import MyOptimizerWorker from '../utils/worker.ts?worker';
 
 console.log("render start~")
 
@@ -131,11 +135,23 @@ const handleOptimize = () => {
     }
   });
 
-  // 2. 執行演算法（傳入原始優惠券陣列與清理後的目標）
-  const result = getBestCouponCombination(props.couponData, cleanTargetTags);
+  // 🎯 2. 改用實體檔案打包的 Web Worker 執行演算法，解決外部 function 找不到的問題
+  const worker = new MyOptimizerWorker();
 
-  // 3. 將結果寫入狀態，驅動 UI 渲染
-  optimizationResult.value = result;
+  // 接收 Worker 計算完成後的資料
+  worker.onmessage = (e) => {
+    // 3. 將結果寫入狀態，驅動 UI 渲染
+    optimizationResult.value = e.data;
+
+    // 計算完畢後釋放 Worker 資源，避免記憶體洩漏
+    worker.terminate();
+  };
+
+  // 傳遞資料給 Worker 開始進行背景計算
+  worker.postMessage({
+    couponData: JSON.parse(JSON.stringify(props.couponData)), // 轉成純資料傳遞
+    cleanTargetTags: cleanTargetTags
+  });
 };
 
 console.log("render ok~")
