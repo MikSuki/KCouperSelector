@@ -29,6 +29,14 @@
       >
         試算最划算組合
       </button>
+
+      <!-- 重新來過的取消/重置按鈕 -->
+      <button
+        @click="handleReset"
+        class="reset-btn"
+      >
+        重置輸入
+      </button>
     </div>
 
     <div v-if="optimizationResult" class="result-section">
@@ -66,10 +74,13 @@
       </div>
     </div>
 
-    <!-- 🎯 新增：轉圈圈 UI 遮罩 -->
+    <!-- 🎯 修改：轉圈圈 UI 遮罩，並在下方加入取消按鈕 -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="loading-spinner"></div>
       <p class="loading-text">正在為您試算最划算組合...</p>
+      <button @click="cancelOptimize" class="loading-cancel-btn">
+        取消計算
+      </button>
     </div>
   </div>
 </template>
@@ -105,8 +116,11 @@ onMounted(() => {
 // 響應式變數：紀錄使用者在每個 Tag 輸入的數量需求
 const userDemands = ref<Record<string, number>>({});
 
-// 🎯 新增：控制載入中狀態的變數
+// 控制載入中狀態的變數
 const isLoading = ref(false);
+
+// 🎯 新增：用來儲存當前 Worker 實體的參照，以便隨時中斷
+let currentWorker: Worker | null = null;
 
 // 響應式變數：儲存演算法計算出來的最終產出結果
 interface UIResult {
@@ -144,29 +158,57 @@ const handleOptimize = () => {
     }
   });
 
-  // 🎯 按下按鈕時開啟 Loading 狀態
+  // 按下按鈕時開啟 Loading 狀態
   isLoading.value = true;
 
-  // 🎯 2. 改用實體檔案打包的 Web Worker 執行演算法，解決外部 function 找不到的問題
-  const worker = new MyOptimizerWorker();
+  // 🎯 2. 改用實體檔案打包的 Web Worker 執行演算法，並將實體存至組件級變數
+  currentWorker = new MyOptimizerWorker();
 
   // 接收 Worker 計算完成後的資料
-  worker.onmessage = (e) => {
+  currentWorker.onmessage = (e) => {
     // 3. 將結果寫入狀態，驅動 UI 渲染
     optimizationResult.value = e.data;
 
-    // 🎯 演算法結束，關閉 Loading 狀態
+    // 演算法結束，關閉 Loading 狀態
     isLoading.value = false;
 
     // 計算完畢後釋放 Worker 資源，避免記憶體洩漏
-    worker.terminate();
+    if (currentWorker) {
+      currentWorker.terminate();
+      currentWorker = null;
+    }
   };
 
   // 傳遞資料給 Worker 開始進行背景計算
-  worker.postMessage({
+  currentWorker.postMessage({
     couponData: JSON.parse(JSON.stringify(props.couponData)), // 轉成純資料傳遞
     cleanTargetTags: cleanTargetTags
   });
+};
+
+/**
+ * 🎯 新增：在 Loading 畫面中點擊取消時觸發
+ */
+const cancelOptimize = () => {
+  if (currentWorker) {
+    currentWorker.terminate(); // 核心：直接砍掉背景線程，停止計算
+    currentWorker = null;
+  }
+  isLoading.value = false; // 關閉遮罩
+  console.log('使用者取消了本次試算');
+};
+
+/**
+ * 重置所有輸入與結果
+ */
+const handleReset = () => {
+  if (currentWorker) {
+    currentWorker.terminate();
+    currentWorker = null;
+  }
+  userDemands.value = {};
+  optimizationResult.value = null;
+  isLoading.value = false;
 };
 
 console.log("render ok~")
@@ -274,10 +316,12 @@ h2, h3 {
 }
 
 /* =============================================================== */
-/* 🎯 4. 送出按鈕 */
+/* 🎯 4. 按鈕區塊 */
 /* =============================================================== */
 .action-area {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* 按鈕間距 */
   margin-bottom: 20px;
   margin-top: 25px;
 }
@@ -304,6 +348,24 @@ h2, h3 {
   color: #94a3b8 !important;
   cursor: not-allowed;
   box-shadow: none !important;
+}
+
+/* 重置按鈕樣式 */
+.reset-btn {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn:hover {
+  background-color: #e2e8f0 !important;
+  color: #1e293b !important;
 }
 
 /* =============================================================== */
@@ -429,9 +491,28 @@ h2, h3 {
 
 .loading-text {
   margin-top: 15px;
+  margin-bottom: 15px; /* 給下方的取消按鈕留點呼吸空間 */
   font-size: 15px;
   color: #475569;
   font-weight: 600;
+}
+
+/* 🎯 新增：Loading 內部的取消按鈕樣式 */
+.loading-cancel-btn {
+  background-color: #ef4444 !important; /* 警示紅 */
+  color: #ffffff !important;
+  border: none;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+  transition: background-color 0.2s;
+}
+
+.loading-cancel-btn:hover {
+  background-color: #dc2626 !important;
 }
 
 @keyframes spin {
