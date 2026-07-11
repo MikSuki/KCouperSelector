@@ -31,7 +31,7 @@
 
     <div v-if="optimizationResult" class="result-section">
       <hr />
-      <h3>🎯 最佳省錢組合結果</h3>
+      <h3>最佳省錢組合結果</h3>
 
       <div class="total-price-badge">
         總金額：<span>${{ optimizationResult.totalPrice }}</span>
@@ -140,56 +140,58 @@ console.log("render ok~")
 </script>
 
 <style scoped>
+/* =============================================================== */
+/* 1. 外層大卡片容器：維持純白底，強化對比 */
+/* =============================================================== */
 .coupon-optimizer-container {
-  /* 🎯 徹底解放：永遠維持目前螢幕寬度的 80% */
-  width: 90% !important;
-  max-width: 100% !important; /* 解除 1200px 限制，最高允許延伸至全螢幕 */
+  /* 🎯 已校正：寬度改回目前螢幕的 80% */
+  width: 80% !important;
+  max-width: 100% !important;
 
   min-height: auto !important;
-  margin: 30px auto !important; /* 上下留白，左右靠 auto 完美鎖定在 80% 的正中央 */
+  margin: 30px auto !important;
   padding: 35px;
 
-  border: 1px solid #eef2f5 !important;
+  border: 1px solid #e2e8f0 !important; /* 改用帶點藍的現代感灰色邊框 */
   border-radius: 16px !important;
-  background-color: #ffffff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+  background-color: #ffffff !important; /* 強制白底 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
 
   font-family: system-ui, -apple-system, sans-serif;
   box-sizing: border-box !important;
+
+  /* 🎯 關鍵：強制讓容器內的預設文字顏色變深 */
+  color: #222222 !important;
 }
+
+/* 強制將大標題與區塊標題改為深黑色 */
+h2, h3 {
+  color: #1a1a1a !important;
+  font-weight: 700 !important;
+  margin-bottom: 20px;
+}
+
 /* =============================================================== */
-/* 🎯 核心 RWD 排版：改用 Grid 佈局能完美控制「一列幾個」 */
+/* 🎯 2. RWD 網格排列 (維持原本完美的 Grid 邏輯) */
 /* =============================================================== */
 .input-grid {
   display: grid !important;
   gap: 15px !important;
   width: 100% !important;
   box-sizing: border-box !important;
-
-  /* 預設：超大螢幕一列排 4 個 */
   grid-template-columns: repeat(4, 1fr);
 }
 
-/* 隨螢幕尺寸動態調整一列的數量 */
 @media (max-width: 1024px) {
-  .input-grid {
-    grid-template-columns: repeat(3, 1fr); /* 1024px 以下（如 iPad）：一列 3 個 */
-  }
+  .input-grid { grid-template-columns: repeat(3, 1fr); }
 }
-
 @media (max-width: 768px) {
-  .input-grid {
-    grid-template-columns: repeat(2, 1fr); /* 768px 以下（如直向平板）：一列 2 個 */
-  }
+  .input-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (max-width: 480px) {
-  .input-grid {
-    grid-template-columns: repeat(1, 1fr); /* 480px 以下（如小手機）：一列 1 個滿版 */
-  }
+  .input-grid { grid-template-columns: repeat(1, 1fr); }
 }
 
-/* 控制每個選項的內部元件 */
 .input-group {
   display: flex !important;
   flex-direction: column !important;
@@ -198,119 +200,167 @@ console.log("render ok~")
 }
 
 /* =============================================================== */
-/* 剩下的樣式維持原樣 */
+/* 🎯 3. 輸入框與標籤色彩升級 */
 /* =============================================================== */
-
 .input-group label {
   font-size: 14px;
   margin-bottom: 6px;
-  color: #666666;
-  font-weight: 500;
+  /* 🎯 修正：將原本的 #666666 改為更深的灰黑色，字體加粗，清晰度大提升 */
+  color: #334155 !important;
+  font-weight: 600 !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .input-group input {
-  padding: 8px 12px;
-  border: 1px solid #cccccc;
-  border-radius: 6px;
+  padding: 10px 12px; /* 稍微加高一點更好點擊 */
+  border: 1px solid #cbd5e1 !important; /* 邊框線條更清晰 */
+  border-radius: 8px;
   font-size: 16px;
+  /* 🎯 修正：強制定義輸入框內的數字顏色，防止因為全域 CSS 變成白字 */
+  color: #0f172a !important;
+  background-color: #f8fafc !important; /* 給輸入框一個極淺的灰色底，更好辨識 */
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* 當滑鼠移上去或點擊時，框線亮起 */
+.input-group input:hover {
+  border-color: #94a3b8 !important;
+}
 .input-group input:focus {
-  border-color: #4caf50;
+  border-color: #10b981 !important; /* 質感更好的科技綠 */
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
 }
 
+/* =============================================================== */
+/* 🎯 4. 送出按鈕 */
+/* =============================================================== */
 .action-area {
   text-align: center;
   margin-bottom: 20px;
-  margin-top: 25px; /* 拉大跟上面 input 的間距 */
+  margin-top: 25px;
 }
 
 .submit-btn {
-  background-color: #4caf50;
-  color: white;
+  background-color: #10b981 !important; /* 改用更亮眼、富現代感的翡翠綠 */
+  color: #ffffff !important; /* 絕對白字 */
   border: none;
-  padding: 12px 30px;
+  padding: 12px 35px;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2) !important;
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #059669 !important;
 }
 
 .submit-btn:disabled {
-  background-color: #cccccc;
+  background-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
   cursor: not-allowed;
+  box-shadow: none !important;
 }
 
+/* =============================================================== */
+/* 🎯 5. 試算結果區塊 */
+/* =============================================================== */
 .result-section {
   width: 100%;
 }
 
+.result-section hr {
+  border: 0;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 25px 0;
+}
+
+/* 總金額的大徽章 */
 .total-price-badge {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  color: #856404;
+  background-color: #fef3c7 !important; /* 溫和的淡黃底 */
+  border: 1px solid #fde68a !important;
+  color: #78350f !important; /* 深琥珀色字 */
   padding: 15px;
   border-radius: 8px;
   font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
   text-align: center;
 }
 
 .total-price-badge span {
-  color: #d9534f;
-  font-size: 24px;
+  color: #dc2626 !important; /* 顯眼的搶眼紅 */
+  font-size: 26px;
+  margin-left: 5px;
 }
 
-.coupon-card {
-  border: 1px dashed #ffa726;
-  background-color: #fff9c4;
-  border-radius: 8px;
-  padding: 15px;
+.coupon-list h4 {
+  color: #475569 !important;
   margin-bottom: 15px;
+}
+
+/* 優惠券卡片本體 */
+.coupon-card {
+  border: 1px dashed #f59e0b !important; /* 橘黃虛線邊框 */
+  background-color: #fffbeb !important; /* 溫馨的暖色大底 */
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.05) !important;
 }
 
 .coupon-header {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #ffe082;
-  padding-bottom: 8px;
-  margin-bottom: 10px;
+  align-items: center;
+  border-bottom: 1px dashed #fcd34d;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .coupon-title {
-  font-weight: bold;
-  color: #e65100;
+  font-weight: 700;
+  color: #b45309 !important; /* 深橘色標題 */
+  font-size: 16px;
 }
 
 .coupon-code {
-  color: #757575;
+  color: #64748b !important; /* 清楚的灰色代碼 */
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.coupon-body h5 {
+  color: #475569 !important;
+  margin: 0 0 8px 0;
   font-size: 14px;
 }
 
 .coupon-body ul {
   margin: 5px 0;
   padding-left: 20px;
-  color: #424242;
+  color: #1e293b !important; /* 🎯 修正：將原本極淡的 #424242 改為清晰的深藍黑字 */
+  font-weight: 500;
+}
+
+.coupon-body li {
+  margin-bottom: 4px;
 }
 
 .coupon-footer {
   text-align: right;
-  font-size: 14px;
-  color: #e65100;
-  font-weight: 500;
-  margin-top: 5px;
+  font-size: 15px;
+  color: #b45309 !important;
+  font-weight: 700;
+  margin-top: 10px;
 }
 </style>
