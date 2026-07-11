@@ -1,5 +1,7 @@
 <template>
   <div class="coupon-optimizer-container">
+    <h1 class="main-title">KCouperSelector</h1>
+
     <h2>填寫您需要的餐點數量</h2>
 
     <div class="input-grid">
