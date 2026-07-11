@@ -65,6 +65,12 @@
         </div>
       </div>
     </div>
+
+    <!-- 🎯 新增：轉圈圈 UI 遮罩 -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">正在為您試算最划算組合...</p>
+    </div>
   </div>
 </template>
 
@@ -98,6 +104,9 @@ onMounted(() => {
 
 // 響應式變數：紀錄使用者在每個 Tag 輸入的數量需求
 const userDemands = ref<Record<string, number>>({});
+
+// 🎯 新增：控制載入中狀態的變數
+const isLoading = ref(false);
 
 // 響應式變數：儲存演算法計算出來的最終產出結果
 interface UIResult {
@@ -135,6 +144,9 @@ const handleOptimize = () => {
     }
   });
 
+  // 🎯 按下按鈕時開啟 Loading 狀態
+  isLoading.value = true;
+
   // 🎯 2. 改用實體檔案打包的 Web Worker 執行演算法，解決外部 function 找不到的問題
   const worker = new MyOptimizerWorker();
 
@@ -142,6 +154,9 @@ const handleOptimize = () => {
   worker.onmessage = (e) => {
     // 3. 將結果寫入狀態，驅動 UI 渲染
     optimizationResult.value = e.data;
+
+    // 🎯 演算法結束，關閉 Loading 狀態
+    isLoading.value = false;
 
     // 計算完畢後釋放 Worker 資源，避免記憶體洩漏
     worker.terminate();
@@ -180,6 +195,9 @@ console.log("render ok~")
 
   /* 🎯 關鍵：強制讓容器內的預設文字顏色變深 */
   color: #222222 !important;
+
+  /* 🎯 關鍵：設定為相對定位，好讓 Loading 遮罩精準覆蓋在容器內部 */
+  position: relative;
 }
 
 /* 強制將大標題與區塊標題改為深黑色 */
@@ -380,5 +398,44 @@ h2, h3 {
   color: #b45309 !important;
   font-weight: 700;
   margin-top: 10px;
+}
+
+/* =============================================================== */
+/* 🎯 6. 新增：Loading 轉圈圈 UI 樣式 */
+/* =============================================================== */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.85); /* 半透明白底，美美地遮住卡片內容 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 16px;
+}
+
+.loading-spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #10b981; /* 綠色轉圈圈，搭配你的專案主視覺 */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  margin-top: 15px;
+  font-size: 15px;
+  color: #475569;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
