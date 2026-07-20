@@ -12,28 +12,9 @@ interface ItemTag {
 const itemTagData = ref<ItemTag[]>([])
 const couponData = ref<Coupon[]>([])
 
-// 1. 初始化資料網址
-let dataURL = ''
-
-// 2. 利用 MODE 進行分流判定
-if (import.meta.env.MODE === 'development') {
-  dataURL = '/data/item_tag.json'
-  const baseURL = import.meta.env.BASE_URL
-  dataURL = `${baseURL}data/item_tag.json`
-  console.log('目前處於【本地開發環境】，讀取路徑：', dataURL)
-
-} else {
-
-  // 🚀 【GitHub 部署模式 (Production)】
-  // 當執行 npm run build 後，MODE 會變成 'production'
-  // 這時候我們直接強制指向 GitHub 的真實絕對網址，最不易出錯！
-  dataURL = '../data/item_tag.json'
-  console.log('目前處於【正式上線環境】，讀取路徑：', dataURL)
-
-}
-
 const fetchItemTagData = async () => {
   try {
+    const dataURL = import.meta.env.VITE_DATA_BASE_URL + 'data/item_tag.json'
     const response = await fetch(dataURL)
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
@@ -50,8 +31,8 @@ const fetchItemTagData = async () => {
 
 const fetchCouponData = async () => {
   try {
-    const baseURL = import.meta.env.BASE_URL
-    const response = await fetch(`${baseURL}data/coupon_data.json`)
+    const dataURL = import.meta.env.VITE_DATA_BASE_URL + 'data/coupon_data.json'
+    const response = await fetch(dataURL)
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
