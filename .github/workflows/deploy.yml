@@ -1,0 +1,59 @@
+name: Run ETL and Update GUI Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天 UTC 0:00 (台灣時間早上 8:00) 執行一次
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  run-etl-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew in etl
+        run: chmod +x etl/gradlew
+
+      - name: Run Kotlin ETL script
+        run: |
+          cd etl
+          ./gradlew run
+
+      - name: Move generated JSON files to GUI public/data
+        run: |
+          mkdir -p gui/public/data
+          cp etl/coupon_data.json gui/public/data/
+          cp etl/item_tag.json gui/public/data/
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: gui/package-lock.json
+
+      - name: Build Vue App
+        run: |
+          cd gui
+          npm install
+          npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './gui/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

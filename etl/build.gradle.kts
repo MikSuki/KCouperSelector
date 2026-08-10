@@ -1,7 +1,11 @@
 plugins {
     kotlin("jvm") version "2.1.10"
     kotlin("plugin.serialization") version "1.9.24"
+    application
+}
 
+application {
+    mainClass.set("com.miksuki.MainKt")
 }
 
 group = "com.miksuki"

@@ -35,7 +35,7 @@ fun main() {
             )
         }
 
-    writeFile(cleanedCouponData, "couple.json").onFailure {
+    writeFile(cleanedCouponData, "coupon_data.json").onFailure {
         println("write couple.json failed !, error: $it")
     }
     writeFile(itemToTagCodeMap.values.distinct(), "item_tag.json").onFailure {
