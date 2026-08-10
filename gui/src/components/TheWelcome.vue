@@ -14,7 +14,7 @@ const couponData = ref<Coupon[]>([])
 
 const fetchItemTagData = async () => {
   try {
-    const dataURL = import.meta.env.VITE_DATA_BASE_URL + 'data/item_tag.json'
+    const dataURL = import.meta.env.BASE_URL + 'data/item_tag.json'
     const response = await fetch(dataURL)
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
@@ -31,7 +31,7 @@ const fetchItemTagData = async () => {
 
 const fetchCouponData = async () => {
   try {
-    const dataURL = import.meta.env.VITE_DATA_BASE_URL + 'data/coupon_data.json'
+    const dataURL = import.meta.env.BASE_URL + 'data/coupon_data.json'
     const response = await fetch(dataURL)
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
