@@ -22,7 +22,7 @@ export interface OptimizationResult {
 interface InternalCoupon {
   code: number;
   price: number;
-  itemMap: Map<string, number>;
+  tagMap: Map<string, number>;
 }
 
 /**
@@ -51,7 +51,7 @@ export function getBestCouponCombination(
     for (let i = 0; i < coupon.tags.length; i++) {
       const tag = coupon.tags[i];
       // 只有當這個 tag 是使用者點選的，才放進 Map 追蹤數量
-      if (targetKeys.includes(tag)) {
+      if (tag && targetKeys.includes(tag)) {
         const amount = coupon.amounts[i] || 0;
         tagMap.set(tag, (tagMap.get(tag) || 0) + amount);
       }
@@ -91,6 +91,7 @@ export function getBestCouponCombination(
     // 【步驟 7：依序遍歷優惠券與實質貢獻度檢查】
     for (let i = index; i < filteredCoupons.length; i++) {
       const coupon = filteredCoupons[i];
+      if (!coupon) continue;
 
       // 🎯 抽離後的私有函式呼叫：檢查這張券是否有實質貢獻
       if (!hasValueContribution(coupon.tagMap, currentProgress, targetTags)) {
@@ -145,7 +146,8 @@ function hasValueContribution(
 
 function isAllSatisfied(progress: Map<string, number>, target: TargetTags): boolean {
   for (const tag of Object.keys(target)) {
-    if ((progress.get(tag) || 0) < target[tag]) {
+    const targetCount = target[tag] ?? 0;
+    if ((progress.get(tag) || 0) < targetCount) {
       return false;
     }
   }
