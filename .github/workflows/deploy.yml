@@ -1,4 +1,4 @@
-name: Run ETL and Update GUI Data
+name: "pages-build-deployment"
 
 on:
   schedule:
